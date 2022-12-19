@@ -24,9 +24,9 @@ Here, I give an overview of the folder content, their use and meaning in the exp
 2. Modules
 3. Notebooks
 4. Scripts
-5. Output_Experiment
+5. Output_Experiments
 
-#### 1. Input_Data 
+### 1. Input_Data 
 
 Input_Data folder contains four datasets which can be employed as input for EpiMob_TransferEntropy experiments.
 
