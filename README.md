@@ -20,13 +20,13 @@ The libraries employed for the EpiMob_TransferEntropy Project are the ones impor
 The EpiMob_TransferEntropy Project is subdivided in folders which contain synthetic input data, code functions, a script for launching the EpiMob_TransferEntropy experiment and an output folder for collecting the experiment results. 
 Here, I give an overview of the folder content, their use and meaning in the experiment pipeline. The subfolders of EpiMob_TransferEntropy project are: 
 
-- 1. Input_Data
-- 2. Modules
-- 3. Notebooks
-- 4. Scripts
-- 5. Output_Experiment
+1. Input_Data
+2. Modules
+3. Notebooks
+4. Scripts
+5. Output_Experiments
 
-#### 1. Input_Data 
+### 1. Input_Data 
 
 Input_Data folder contains four datasets which can be employed as input for EpiMob_TransferEntropy experiments.
 
