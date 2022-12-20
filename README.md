@@ -14,87 +14,67 @@ The libraries employed for the EpiMob_TransferEntropy Project are the ones impor
 - datetime
 - PyCausality
 
-
 ### Folders of EpiMob_TransferEntropy Project 
 
-The EpiMob_TransferEntropy Project is subdivided in folders which contain synthetic input data, code functions, a script for launching the EpiMob_TransferEntropy experiment and an output folder for collecting the experiment results. 
+The EpiMob_TransferEntropy Project is subdivided in folders which contain code functions, a script for launching the EpiMob_TransferEntropy experiment and an output folder for collecting the experiment results. 
 Here, I give an overview of the folder content, their use and meaning in the experiment pipeline. The subfolders of EpiMob_TransferEntropy project are: 
 
 1. Input_Data
 2. Modules
-3. Notebooks
-4. Scripts
-5. Output_Experiments
+3. Scripts
+4. Output_Experiments
+5. Notebooks
+
 
 ### 1. Input_Data 
 
-Input_Data folder contains four datasets which can be employed as input for EpiMob_TransferEntropy experiments.
+Input_Data folder contains two dataframes which record a collection of daily and weekly province level time-series containing mobility and COVID-19 indicators for the four countries France, Austria, Spain, Italy (for Italy we do not have the daily time-series):
+- ts_mob_covid_weekly.csv
+- ts_mob_covid_daily.csv
 
-The datasets are generated in notebook "01_generate_synthetic_dataset.ipynb" contained in Notebooks folder
+The weekly dataframe 'ts_mob_covid_weekly.csv' contains the columns:
 
-Each data-set contains features x and y which are generated with an AutoRegression model and a dummy variable z generated as gaussian noise. 
-- y is dependent by x via a coupling factor c.
-- As c increases, the dependency of y on x increases. 
+- index : weekly date of the record
+- prov : name of the province 
+- N_pop : number of weekly province users from the population dataset
+- N_coloc : number of weekly province users from the colocation dataset
+- cases : number of weekly COVID-19 cases in prov
+- deaths : number of weekly COVID-19 deaths in prov
+- contact_rate : contact rate 
+- short_range_movement : short range movement rate 
+- mid_range_movement : mid range movement rate
+- Country : Country to which the province belongs
 
-We have both a single synthetic time-series and a dataframe of collection of synthetic time-series with low (c=0.1) and high (c=1) coupling factors. 
+The daily dataframe 'ts_mob_covid_daily.csv' contains the columns:
 
-The data-frame collection is created in order to simulate the paper experiments which are performed on mobility and epidemiologic time-series for different provinces. 
+- index : daily date of the record
+- prov : name of the province 
+- cases : number of weekly COVID-19 cases in prov
+- deaths : number of weekly COVID-19 deaths in prov
+- short_range_movement : short range movement rate 
+- mid_range_movement : mid range movement rate
+- Country : Country to which the province belongs
 
-**Single Synthetic Time Series**
-
-The single synthetic time-series has 300 observations with a time-index from 2015-01-01 to 2020-09-24 having weekly frequency. 
-
-The first two time-series datasets are: 
-
-- ‘data_c01.csv’
-	- single synthetic time-series of features (x,y,z)
-	- the coupling factor c is 0.1 
-- ‘data_c1.csv’ 
-	- single synthetic time-series of features (x,y,z) 
-	- the coupling factor c is 1 
-
-**Collection of Synthetic Time Series**
-
-Each time-series element of the collection is associated with a specific zone. 
-
-In this synthetic data, we have three zones called: zone1, zone2, zone3. 
-
-Each zone time-series is generated according to the same procedure followed for creating a single synthetic time-series. 
-
-- ‘data_multi_c01.csv’
-	- data with features (x, y, z, zone)
-	- for each zone we have a single synthetic time-series (x,y,z) with x and y generated with coupling factor c= 0.1 
-- ‘data_multi_c1.csv’
-	- data with features (x, y, z, zone)
-	- for each zone we have a single synthetic time-series (x,y,z) with x and y generated with coupling factor c = 1 
+N_pop and N_coloc columns in the weekly dataframe are employed for province sample selection for both weekly and daily experiments. 
 
 ### 2. Modules 
 
-The Modules folder contains a module named utils.py which contains functions employed for generating the synthetic dataset and launching the EpiMob_TransferEntropy experiment. 
-
+The Modules folder contains a module named utils.py which contains functions for launching the EpiMob_TransferEntropy experiment. 
 The functions are provided with detailed description of input arguments and returned variables. 
-
-### 3. Notebooks
-
-The Notebooks folder contains two jupyter notebooks: 
-- 01_generate_synthetic_dataset.ipynb: 
-generates the synthetic data-sets described in **1. Input_Data**
-- 02_launching_experiment_script.ipynb: launches EpiMob_TransferEntropy experiment described in **4. Scripts**.  
-
-### 4. Scripts
+  
+### 3. Scripts
 
 The Scripts folder contains the Experiment.py script. 
 
-This Script performs Transfer Entropy experiment over the dataframe of collection of synthetic time-series ‘data_multi_c1.csv’.
+This Script performs Transfer Entropy experiment over the dataframe of weekly province time-series collection.
+For reducing the time of computation the Script launches the experiment only on two provinces of Italy (Torino and Milano). 
 
-With these experiment we can specify:
+With this experiment we can specify:
 - the name of the experiment
 - the collection of input features
 - the collection of output features
 - the collection of lag values for which Transfer Entropy can be evaluated
 - the N_shuffles: number of shuffled TE estimates to compute in order to evaluate ETE
-- the Dates to be selected from the input dataframe
-	- in this experiment we employ by default all the study period setting Dates_select = None 
 
 For each: 
 - Z : zone time-series name 
@@ -119,9 +99,14 @@ The EpiMob_TransferEntropy estimate consists of:
 - p_XY : p-value of ETE estimate
 - NETE = ETE/C1 : normalized transfer entropy estimate
 
-### 5. Output_Experiments
+**NB**: the script can be edited in order to:
+- select weekly or daily dataframe
+- select different Countries
+- select different lags, input and output features for evaluating the EpiMob_TransferEntropy estimates 
 
-Output_Experiments is the destination folder of the results of experiments launched on dataframe of collection of synthetic time-series. 
+### 4. Output_Experiments
+
+Output_Experiments is the destination folder of the results of experiments launched on the weekly dataframe of collection of time-series. 
 
 NB: Launching the experiment requires specifying an experiment name which we refer to as **expname**.
 
@@ -137,7 +122,11 @@ Once these two phases are completed evaluation of NETE can be performed from TE 
 **Final result dataset** has path **“Output_Experiments/Results/df_expname.csv”**  
 
 
+### 5. Notebooks
 
-
+The Notebooks folder contains the notebook 'launching_experiment_script.ipynb' which:
+- displays the two possible input dataframe; daily and weekly province-level time-series 
+- launches EpiMob_TransferEntropy experiment described in **3. Scripts**.
+- displays the results dataframe contained in Output_Experiments folder
 
 

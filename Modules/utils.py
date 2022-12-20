@@ -5,78 +5,6 @@ import pandas as pd
 import datetime as dt
 from PyCausality.TransferEntropy import *
 
-#FUNCTIONS FOR SYNTHETIC DATA GENERATION 
-
-def AR_step(x,y, c = 0.01):
-    """
-    x,y : input variables for generating new observations (x_new, y_new)
-    c   : coupling factor
-    >> as c increases, the more x has a contribute on the evolution of y
-    
-    return x_new, y_new
-    
-    the function performs a single iteration of the AR model
-    """
-    y_new = 0.6*x + c*y + np.random.normal()
-    x_new = 0.5*x + np.random.normal()
-    
-    return x_new, y_new
-    
-def AR_process(L, c = 0.01):
-    """
-    L : length of the time-series generated with the AR model from AR_step() function
-    c : coupling factor
-    
-    return ts_process
-    
-    ts_process: time-series dataframe with L records with columns (x,y,z) 
-    > y depends on x via coupling factor c 
-    > z is a dummy variable generated from unit gaussian distribution; it has no relationship with x and z 
-    """
-    
-    x_init = np.random.normal()
-    y_init = np.random.normal() 
-    
-    L_process = [ [x_init, y_init] ]
-    
-    for i in range(L):
-            
-        x = L_process[-1][0]
-        y = L_process[-1][1]
-    
-        x_new, y_new = AR_step(x,y,c)
-        
-        L_process.append( [x_new,y_new])
-        
-    ts_process = pd.DataFrame(L_process, columns= ["x", "y"])
-    #joining dummy variable z 
-    ts_process["z"] = np.random.normal(size = len(ts_process))
-    
-    return ts_process
-
-def gen_synthetic_data(length = 1000, c = 0.5):
-    """
-    length : length of the synthetic dataframe
-    c : coupling factor
-    
-    return data
-    
-    synthetic dataframe with 
-    """
-
-    #number of initial records not considered in the data generating process
-    transient = 10000
-    #time-series generated according to the AR model
-    ts_process = AR_process(transient + length, c = c)
-    
-    #collecting the AR model generated data after the transient steps
-    data = ts_process[-length:]
-    data.index = range(len(data))
-    
-    return data
-
-#FUNCTIONS FOR TRANSFER ENTROPY EXPERIMENTS 
-
 #subsetting a dataframe according to its unique feature values
 def subset_df_feature(df, 
                       feature):
@@ -416,7 +344,6 @@ def EXP_TE(df_,
            Output_features,    
            LAGS = [1],                                       
            gridpoints = 20,                                  
-           Dates_select = None,
            zone_name = "zone",
            FOLD_save = "../Output_Experiments/fold_save/"):  
     """
@@ -427,7 +354,6 @@ def EXP_TE(df_,
     ETE_SHUFFLES : number of shuffled TE estimates employed for performing ETE estimation
     >> this function is part of the pipeline and ETE_SHUFFLES is set to 1 
     gridpoints   : number of grid points per dimension employed in kernel density estimation 
-    Dates_select : list of dates to select from records of df_
     >> it can be useful if it is needed to perform experiments in a more narrow study period
     zone_name: name of the feature which defines the elements of the collection of time-series which make up df_
     FOLD_save: fold in which TE estimates are stored
@@ -457,9 +383,6 @@ def EXP_TE(df_,
 
     df = pd.DataFrame(df_, copy = True)
     
-    #filtering dates
-    if Dates_select is not None:
-        df  = df.loc[[d in Dates_select for d in df.index]]
     
     #subsetting dataframe by zone names; each zone is associated to a time-series 
     DICT_df_zone = subset_df_feature(df, feature = zone_name)
@@ -552,7 +475,6 @@ def EXP_TE_shuffle(df_,
                    LAGS = [1],                                     
                    ETE_SHUFFLES = 20,                               
                    gridpoints = 20,                                 
-                   Dates_select = None,
                    zone_name = "zone",
                    FOLD_save = "../Output_Experiments/fold_save/"):
     """
@@ -562,12 +484,10 @@ def EXP_TE_shuffle(df_,
     LAGS           : list of lag parameters for TE computation   
     ETE_SHUFFLES : number of shuffled TE estimates employed for performing ETE estimation
     gridpoints   : number of grid points per dimension employed in kernel density estimation 
-    Dates_select : list of dates to select from records of df_
     >> it can be useful if it is needed to perform experiments in a more narrow study period
     zone_name: name of the feature which defines the elements of the collection of time-series which make up df_
     FOLD_save: fold in which TE estimates are stored
     >> TE SHUFFLED estimates are stored in FOLD_TE = FOLD_save + name_exp + "_" + "TE_SHUFFLE/"
-
    
     return df_results
     
@@ -590,8 +510,7 @@ def EXP_TE_shuffle(df_,
     """
 
     df = pd.DataFrame(df_,copy = True)
-    if Dates_select is not None:
-        df  = df.loc[[d in Dates_select for d in df.index]]
+    
 
     DICT_df_zone = subset_df_feature(df, feature = zone_name)
     Zones = list(DICT_df_zone.keys())
@@ -708,7 +627,7 @@ def pipeline_exp(df_,
                  Output_features      = ['y'],
                  LAGS_        = [2,3,4,5,6,7,8],
                  N_shuffles   = 500,
-                 Dates_select = None,
+                 zone_name = 'prov',
                  FOLD_save = "../Output_Experiments/"):
     """
     df_ : input dataframe 
@@ -721,12 +640,11 @@ def pipeline_exp(df_,
     Output_features          : output signals for TE computation
     LAGS_            : lags values for computation
     N_shuffles       : used in "TE_SHUFFLE" step, number of iterations for shuffling the time-series
-    Dates_select : list of dates to select from records of df_
     FOLD_save        : folder containing experiment results 
     """
 
 
-    zones = df_["zone"].dropna().unique()
+    zones = df_[zone_name].dropna().unique()
     
     if EXP_step == "TE":
 
@@ -740,8 +658,7 @@ def pipeline_exp(df_,
                             Output_features,                                       
                             gridpoints = 20,                               
                             LAGS = LAGS_,                                    
-                            Dates_select = Dates_select,
-                            zone_name = "zone",
+                            zone_name = zone_name,
                             FOLD_save = FOLD_save + name_exp + "_TE/")
 
     if EXP_step == "TE_SHUFFLE":
@@ -756,8 +673,7 @@ def pipeline_exp(df_,
                                     ETE_SHUFFLES = N_shuffles,                             
                                     gridpoints = 20,                               
                                     LAGS = LAGS_,                                    
-                                    Dates_select = Dates_select,
-                                    zone_name = "zone",
+                                    zone_name = zone_name,
                                     FOLD_save = FOLD_save + name_exp + "_TE_SHUFFLE/")
 
     if EXP_step == "NETE":

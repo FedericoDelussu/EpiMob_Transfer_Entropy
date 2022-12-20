@@ -17,19 +17,23 @@ sys.path.insert(0, parentdir)
 from Modules import utils
 
 #NAME OF THE EXPERIMENT
-name_exp = "exp_data_multi_c1"
+name_exp = "exptry"
 
 #PARAMETERS OF THE EXPERIMENT
-Input_features = ["x"]
-Output_features = ["y","z"]
-LAGS_ = [2,3,4]
+Country = 'Italy'
+
+Input_features = ["short_range_movement",'contact_rate']
+Output_features = ["cases","deaths"]
+LAGS_ = [2,3]
 N_shuffles = 10
-Dates_select = None #select all the study period
 
 #INPUT DATAFRAME 
 #importing dataframe with collection of time-series 
-path = '../Input_Data/data_multi_c1.csv'
+path = '../Input_Data/ts_mob_covid_weekly.csv'
 df_input = pd.read_csv(path, index_col = 0)
+df_input = df_input[df_input['Country'] == Country]
+#SELECT ONLY 2 PROVINCES FOR COMPLETING EXPERIMENTS IN SHORT TIME
+df_input = df_input[ (df_input['prov'] == 'Milano') | (df_input['prov'] == 'Torino') ]
 
 
 #PATHS CONTAINING EXPERIMENT RESULTS 
@@ -75,6 +79,4 @@ for exp_step in Exp_steps:
                        LAGS_          = LAGS_,
                        EXP_step       = exp_step,
                        N_shuffles     = N_shuffles,
-                       Dates_select   = Dates_select,
                        FOLD_save      = FOLD_save)
-    
