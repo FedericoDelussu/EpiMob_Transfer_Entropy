@@ -1,8 +1,8 @@
-## README EpiMob_TransferEntropy
+## README EpiMob_Transfer_Entropy
 
 ### Libraries 
 
-The libraries employed for the EpiMob_TransferEntropy Project are the ones imported in the script “Scripts/Experiment.py”: 
+The libraries employed for the EpiMob_Transfer_Entropy Project are the ones imported in the script “Scripts/Experiment.py”: 
 
 - os
 - inspect 
@@ -14,10 +14,10 @@ The libraries employed for the EpiMob_TransferEntropy Project are the ones impor
 - datetime
 - PyCausality
 
-### Folders of EpiMob_TransferEntropy Project 
+### Folders of EpiMob_Transfer_Entropy Project 
 
-The EpiMob_TransferEntropy Project is subdivided in folders which contain code functions, a script for launching the EpiMob_TransferEntropy experiment and an output folder for collecting the experiment results. 
-Here, I give an overview of the folder content, their use and meaning in the experiment pipeline. The subfolders of EpiMob_TransferEntropy project are: 
+The EpiMob_Transfer_Entropy Project is subdivided in folders which contain code functions, a script for launching the EpiMob_Transfer_Entropy experiment and an output folder for collecting the experiment results. 
+Here, I give an overview of the folder content, their use and meaning in the experiment pipeline. The subfolders of EpiMob_Transfer_Entropy project are: 
 
 1. Input_Data
 2. Modules
@@ -126,7 +126,7 @@ Once these two phases are completed evaluation of NETE can be performed from TE 
 
 The Notebooks folder contains the notebook 'launching_experiment_script.ipynb' which:
 - displays the two possible input dataframe; daily and weekly province-level time-series 
-- launches EpiMob_TransferEntropy experiment described in **3. Scripts**.
+- launches EpiMob_Transfer_Entropy experiment described in **3. Scripts**.
 - displays the results dataframe contained in Output_Experiments folder
 
 
