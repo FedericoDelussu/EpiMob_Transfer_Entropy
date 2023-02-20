@@ -6,8 +6,7 @@ import datetime as dt
 from PyCausality.TransferEntropy import *
 
 #subsetting a dataframe according to its unique feature values
-def subset_df_feature(df, 
-                      feature):
+def subset_df_feature(df, feature):
     """
     df: input dataframe
     feature: feature of df for which unique values are computed
@@ -412,58 +411,68 @@ def EXP_TE(df_,
                 for Y in Output_features:
                     
                     print("\t\t\t computing TE from " + X + " to " + Y)
-
-                    ts = DICT_df_zone[zone][[X,Y]]
-
-                    #in this procedure step we only need TE estimates
-                    df_TE, _, _ = ETE_estimate_KDE_df(ts,
-                                                      exog  = X,
-                                                      endog = Y,
-                                                      lag   = LAG,
-                                                      bandwidth = "scott",
-                                                      gridpoints = gridpoints,
-                                                      n_shuffles = 0,
-                                                      ETE_shuffles = 1, #shuffled estimates are not used
-                                                      half = True)
-
                     
-                    #joining experiment features
-                    df_TE["zone"] = zone
-                    df_TE["LAG"] = LAG
+                    try:
 
-                    #JOINING TE_XY ENTROPY COMPONENTS
-                    TE, dict_Hterms = TE_estimate_KDE(ts,
-                                                      X, Y,
-                                                      lag = LAG,
-                                                      direction = "xy",
-                                                      bandwidth = "scott",
-                                                      gridpoints = 20)
-   
-                    H1 = dict_Hterms["H1"]
-                    H2 = dict_Hterms["H2"]
-                    H3 = dict_Hterms["H3"]
-                    H4 = dict_Hterms["H4"]
-
-                    dict_TE_xy_terms = {"H1" : H1,
-                                        "H2" : H2,
-                                        "H3" : H3,
-                                        "H4" : H4,
-                                        "C1" : H3-H4,
-                                        "C2" : H1-H2}
-
-
-                    for c in ["H1","H2","H3","H4","C1","C2"]:
-                        c_val = dict_TE_xy_terms[c]
-                        df_TE[c] = c_val
-
-                    df_zone.append(df_TE)
-                    df_results.append(df_TE)
-
-        df_zone = pd.concat(df_zone, axis=0)
+                        ts = DICT_df_zone[zone][[X,Y]]
     
-        #save zone results 
-        if FOLD_save is not None: 
-            df_zone.to_csv(FOLD_save +zone +".csv")
+                        #in this procedure step we only need TE estimates
+                        df_TE, _, _ = ETE_estimate_KDE_df(ts,
+                                                          exog  = X,
+                                                          endog = Y,
+                                                          lag   = LAG,
+                                                          bandwidth = "scott",
+                                                          gridpoints = gridpoints,
+                                                          n_shuffles = 0,
+                                                          ETE_shuffles = 1, #shuffled estimates are not used
+                                                          half = True)
+    
+                        
+                        #joining experiment features
+                        df_TE["zone"] = zone
+                        df_TE["LAG"] = LAG
+    
+                        #JOINING TE_XY ENTROPY COMPONENTS
+                        TE, dict_Hterms = TE_estimate_KDE(ts,
+                                                          X, Y,
+                                                          lag = LAG,
+                                                          direction = "xy",
+                                                          bandwidth = "scott",
+                                                          gridpoints = 20)
+       
+                        H1 = dict_Hterms["H1"]
+                        H2 = dict_Hterms["H2"]
+                        H3 = dict_Hterms["H3"]
+                        H4 = dict_Hterms["H4"]
+    
+                        dict_TE_xy_terms = {"H1" : H1,
+                                            "H2" : H2,
+                                            "H3" : H3,
+                                            "H4" : H4,
+                                            "C1" : H3-H4,
+                                            "C2" : H1-H2}
+    
+    
+                        for c in ["H1","H2","H3","H4","C1","C2"]:
+                            c_val = dict_TE_xy_terms[c]
+                            df_TE[c] = c_val
+    
+                        df_zone.append(df_TE)
+                        df_results.append(df_TE)
+            
+                        print("Done")
+                    
+                    except:
+                        pass
+
+        try: 
+            df_zone = pd.concat(df_zone, axis=0)
+        
+            #save zone results 
+            if FOLD_save is not None: 
+                df_zone.to_csv(FOLD_save +zone +".csv")
+        except:
+            pass
     
     df_results = pd.concat(df_results, axis=0)
     
@@ -541,31 +550,38 @@ def EXP_TE_shuffle(df_,
                     
                     print("\t\t\t computing " +str(ETE_SHUFFLES)+ " TE SHUFFLED estimates from " + X + " to " + Y)
                     
-                    ts = DICT_df_zone[zone][[X,Y]]
+                    try: 
+                        
+                        ts = DICT_df_zone[zone][[X,Y]]
+    
+                        df_TE, df_TE_SHUFFLE, df_ETE = ETE_estimate_KDE_df(ts,
+                                                                           exog  = X,
+                                                                           endog = Y,
+                                                                           lag   = LAG,
+                                                                           bandwidth = "scott",
+                                                                           gridpoints = gridpoints,
+                                                                           n_shuffles = 0,
+                                                                           ETE_shuffles = ETE_SHUFFLES)
+                        
+                        
+                        df_TE_SHUFFLE["zone"] = zone
+                        df_TE_SHUFFLE["LAG"] = LAG
+    
+                        df_TE_SHUFFLE["X"] = X
+                        df_TE_SHUFFLE["Y"] = Y
+    
+                        df_zone.append(df_TE_SHUFFLE)
+                        df_results.append(df_TE_SHUFFLE)
+                    except:
+                        pass
 
-                    df_TE, df_TE_SHUFFLE, df_ETE = ETE_estimate_KDE_df(ts,
-                                                                       exog  = X,
-                                                                       endog = Y,
-                                                                       lag   = LAG,
-                                                                       bandwidth = "scott",
-                                                                       gridpoints = gridpoints,
-                                                                       n_shuffles = 0,
-                                                                       ETE_shuffles = ETE_SHUFFLES)
-                    
-                    
-                    df_TE_SHUFFLE["zone"] = zone
-                    df_TE_SHUFFLE["LAG"] = LAG
-
-                    df_TE_SHUFFLE["X"] = X
-                    df_TE_SHUFFLE["Y"] = Y
-
-                    df_zone.append(df_TE_SHUFFLE)
-                    df_results.append(df_TE_SHUFFLE)
-
-        df_zone = pd.concat(df_zone, axis=0)
-
-        if FOLD_save is not None: 
-            df_zone.to_csv(FOLD_save + zone +".csv")
+        try:
+            df_zone = pd.concat(df_zone, axis=0)
+    
+            if FOLD_save is not None: 
+                df_zone.to_csv(FOLD_save + zone +".csv")
+        except:
+            pass
             
     df_results = pd.concat(df_results, axis=0)
             
