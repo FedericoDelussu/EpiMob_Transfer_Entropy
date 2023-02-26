@@ -64,9 +64,11 @@ The functions are provided with detailed description of input arguments and retu
   
 ### 3. Scripts
 
-The Scripts folder contains the Experiment.py script. 
+The Scripts folder contains the scripts:
+- Experiment.py
+- Experiment_input_bivariate_time_series.py
 
-This Script performs Transfer Entropy experiment over the dataframe of weekly province time-series collection.
+The Script Experiment.py performs a Transfer Entropy experiment example over the dataframe of weekly province time-series collection.
 For reducing the time of computation the Script launches the experiment only on two provinces of Italy (Torino and Milano). 
 
 With this experiment we can specify:
@@ -103,6 +105,16 @@ The EpiMob_TransferEntropy estimate consists of:
 - select weekly or daily dataframe
 - select different Countries
 - select different lags, input and output features for evaluating the EpiMob_TransferEntropy estimates 
+
+The Script Experiment_input_bivariate_time_series.py takes in input: 
+- the path of a bivariate time-series which must be in csv format. 
+	- The columns of the csv must be: (index timestamp, zone, x, y). 
+	- The set of unique zone values can be a singleton or we can have multiple zones. Each zone time-series shoud have the same set of index timestamps.
+	- The script will generate a dataframe of NETE estimates from x to y for the different zones of the dataset.
+- the lag of the experiment
+- the number of shuffles for the steps of ETE estimate
+- the name of the experiment dataframe in which results are saved
+
 
 ### 4. Output_Experiments
 
