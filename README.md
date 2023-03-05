@@ -31,6 +31,7 @@ Here, I give an overview of the folder content, their use and meaning in the exp
 Input_Data folder contains two dataframes which record a collection of daily and weekly province level time-series containing mobility and COVID-19 indicators for the four countries France, Austria, Spain, Italy (for Italy we do not have the daily time-series):
 - ts_mob_covid_weekly.csv
 - ts_mob_covid_daily.csv
+- ts_mob_covid_daily_v1.csv
 
 The weekly dataframe 'ts_mob_covid_weekly.csv' contains the columns:
 
@@ -54,6 +55,9 @@ The daily dataframe 'ts_mob_covid_daily.csv' contains the columns:
 - short_range_movement : short range movement rate 
 - mid_range_movement : mid range movement rate
 - Country : Country to which the province belongs
+
+The daily dataframe 'ts_mob_covid_daily_v1.csv' has an additional column with respect to 'ts_mob_covid_daily.csv' which is 'residential'. 
+'residential' feature is obtained from google mobility reports and is expressed as the relative change of time spent at home; the change is evlauated with respect to a pre-pandemic baseline.   
 
 N_pop and N_coloc columns in the weekly dataframe are employed for province sample selection for both weekly and daily experiments. 
 
@@ -115,6 +119,8 @@ The Script Experiment_input_bivariate_time_series.py takes in input:
 - the number of shuffles for the steps of ETE estimate
 - the name of the experiment dataframe in which results are saved
 
+The Notebook 'example_creating_bivariate_timeseries.ipynb' generates an example time-series which can be provided as input to the Script.
+
 
 ### 4. Output_Experiments
 
@@ -141,4 +147,5 @@ The Notebooks folder contains the notebook 'launching_experiment_script.ipynb' w
 - launches EpiMob_Transfer_Entropy experiment described in **3. Scripts**.
 - displays the results dataframe contained in Output_Experiments folder
 
+The Notebook 'example_creating_bivariate_timeseries.ipynb' generates an example time-series which can be provided as input to the Script Experiment_input_bivariate_time_series.py.
 
